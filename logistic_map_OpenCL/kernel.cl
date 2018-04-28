@@ -5,6 +5,30 @@
 // source files.
 
 // Kernel block.
+
+#define INLINE
+
+#ifdef INLINE
+kernel void logisticsmap(
+                         global int *mu,
+                         global int *p,
+                         global int *input,
+                         global int *output)
+{
+    size_t i = get_global_id(0);
+    output[i] = input[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+}
+#else
 kernel void logisticsmap(
                          global int *mu,
                          global int *p,
@@ -17,3 +41,4 @@ kernel void logisticsmap(
         output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
     }
 }
+#endif
