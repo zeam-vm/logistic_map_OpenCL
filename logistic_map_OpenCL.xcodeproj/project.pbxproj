@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		951F9CE8209401DC0095C26A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 951F9CE7209401DC0095C26A /* main.c */; };
+		951F9CEF209402B00095C26A /* kernel.cl in Sources */ = {isa = PBXBuildFile; fileRef = 951F9CEE209402B00095C26A /* kernel.cl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,7 @@
 /* Begin PBXFileReference section */
 		951F9CE4209401DC0095C26A /* logistic_map_OpenCL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = logistic_map_OpenCL; sourceTree = BUILT_PRODUCTS_DIR; };
 		951F9CE7209401DC0095C26A /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		951F9CEE209402B00095C26A /* kernel.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = kernel.cl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +59,7 @@
 		951F9CE6209401DC0095C26A /* logistic_map_OpenCL */ = {
 			isa = PBXGroup;
 			children = (
+				951F9CEE209402B00095C26A /* kernel.cl */,
 				951F9CE7209401DC0095C26A /* main.c */,
 			);
 			path = logistic_map_OpenCL;
@@ -120,6 +123,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				951F9CE8209401DC0095C26A /* main.c in Sources */,
+				951F9CEF209402B00095C26A /* kernel.cl in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
