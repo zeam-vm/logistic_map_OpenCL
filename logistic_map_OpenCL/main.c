@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <sys/time.h>
 
 // This include pulls in everything you need to develop with OpenCL in OS X.
 #include <OpenCL/opencl.h>
@@ -8,22 +10,36 @@
 //  kernel block declaration.                                             // 1
 #include "kernel.cl.h"
 
+#define LOOP 10
+#define P 6700417
+#define MU 22
+
 // Hard-coded number of values to test, for convenience.
-#define NUM_VALUES 1024
+#define NUM_VALUES 0x2000000
+
+
+static float logisticsmap_calc(int x, int p, int mu) {
+    return mu * x * (x + 1) % p;
+}
+
+static float logisticsmap_loopCalc(int num, int x, int p, int mu) {
+    for(int i = 0; i < num; i++) {
+        x = logisticsmap_calc(x, p, mu);
+    }
+    return x;
+}
 
 // A utility function that checks that our kernel execution performs the
 // requested work over the entire range of data.
-static int validate(cl_float* input, cl_float* output) {
+static int validate(cl_int *input, cl_int *output) {
     int i;
     for (i = 0; i < NUM_VALUES; i++) {
-        
-        // The kernel was supposed to square each value.
-        if ( output[i] != (input[i] * input[i]) ) {
+        int expected = logisticsmap_loopCalc(LOOP, input[i], P, MU);
+        if ( output[i] != expected) {
             fprintf(stdout,
                     "Error: Element %d did not match expected output.\n", i);
             fprintf(stdout,
-                    "       Saw %1.4f, expected %1.4f\n", output[i],
-                    input[i] * input[i]);
+                    "       Saw %d, expected %d\n", output[i], expected);
             fflush(stdout);
             return 0;
         }
@@ -35,10 +51,14 @@ int main (int argc, const char * argv[]) {
     int i;
     char name[128];
     
+    struct timeval start_time;
+    gettimeofday(&start_time, NULL);
+    
     // First, try to obtain a dispatch queue that can send work to the
     // GPU in our system.                                             // 2
-    dispatch_queue_t queue =
-    gcl_create_dispatch_queue(CL_DEVICE_TYPE_GPU, NULL);
+    dispatch_queue_t queue = NULL;
+    
+    queue = gcl_create_dispatch_queue(CL_DEVICE_TYPE_GPU, NULL);
     
     // In the event that our system does NOT have an OpenCL-compatible GPU,
     // we can use the OpenCL CPU compute device instead.
@@ -57,15 +77,25 @@ int main (int argc, const char * argv[]) {
     // Normally, when this application is running for real, data would come from
     // some REAL source, such as a camera, a sensor, or some compiled collection
     // of statistics—it just depends on the problem you want to solve.
-    float* test_in = (float*)malloc(sizeof(cl_float) * NUM_VALUES);
+    int *test_in = (int *)malloc(sizeof(cl_int) * NUM_VALUES);
     for (i = 0; i < NUM_VALUES; i++) {
-        test_in[i] = (cl_float)i;
+        test_in[i] = (cl_int)i;
     }
     
     // Once the computation using CL is done, will have to read the results
     // back into our application's memory space.  Allocate some space for that.
-    float* test_out = (float*)malloc(sizeof(cl_float) * NUM_VALUES);
+    int *test_out = (int *)malloc(sizeof(cl_int) * NUM_VALUES);
     
+    int *test_mu = (int *)malloc(sizeof(cl_int) * NUM_VALUES);
+    for (i = 0; i < NUM_VALUES; i++) {
+        test_mu[i] = (cl_int)MU;
+    }
+
+    int *test_p = (int *)malloc(sizeof(cl_int) * NUM_VALUES);
+    for (i = 0; i < NUM_VALUES; i++) {
+        test_p[i] = (cl_int)P;
+    }
+
     // The test kernel takes two parameters: an input float array and an
     // output float array.  We can't send the application's buffers above, since
     // our CL device operates on its own memory space.  Therefore, we allocate
@@ -73,13 +103,17 @@ int main (int argc, const char * argv[]) {
     // we specify CL_MEM_COPY_HOST_PTR and provide the fake input data we
     // created above.  This tells OpenCL to copy the data into its memory
     // space before it executes the kernel.                               // 3
-    void* mem_in  = gcl_malloc(sizeof(cl_float) * NUM_VALUES, test_in,
+    void* mem_mu  = gcl_malloc(sizeof(cl_int) * NUM_VALUES, test_mu,
                                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR);
-    
+    void* mem_p  = gcl_malloc(sizeof(cl_int) * NUM_VALUES, test_p,
+                               CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR);
+    void* mem_in  = gcl_malloc(sizeof(cl_int) * NUM_VALUES, test_in,
+                               CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR);
+
     // The output array is not initalized; we're going to fill it up when
     // we execute our kernel.                                             // 4
     void* mem_out =
-    gcl_malloc(sizeof(cl_float) * NUM_VALUES, NULL, CL_MEM_WRITE_ONLY);
+    gcl_malloc(sizeof(cl_int) * NUM_VALUES, NULL, CL_MEM_WRITE_ONLY);
     
     // Dispatch the kernel block using one of the dispatch_ commands and the
     // queue created earlier.                                            // 5
@@ -89,7 +123,7 @@ int main (int argc, const char * argv[]) {
         // OpenCL to pick the one it thinks is best, we can also ask
         // OpenCL for the suggested size, and pass it ourselves.
         size_t wgs;
-        gcl_get_kernel_block_workgroup_info(square_kernel,
+        gcl_get_kernel_block_workgroup_info(logisticsmap_kernel,
                                             CL_KERNEL_WORK_GROUP_SIZE,
                                             sizeof(wgs), &wgs, NULL);
         
@@ -121,7 +155,7 @@ int main (int argc, const char * argv[]) {
         // expected OpenCL types.  Remember, a 'float' in the
         // kernel, is a 'cl_float' from the application's perspective.   // 8
         
-        square_kernel(&range,(cl_float*)mem_in, (cl_float*)mem_out);
+        logisticsmap_kernel(&range,(cl_int*)mem_mu, (cl_int*)mem_p, (cl_int*)mem_in, (cl_int*)mem_out);
         
         // Getting data out of the device's memory space is also easy;
         // use gcl_memcpy.  In this case, gcl_memcpy takes the output
@@ -135,7 +169,7 @@ int main (int argc, const char * argv[]) {
     
     // Check to see if the kernel did what it was supposed to:
     if ( validate(test_in, test_out)) {
-        fprintf(stdout, "All values were properly squared.\n");
+        fprintf(stdout, "All values were OK.\n");
     }
     
     // Don't forget to free up the CL device's memory when you're done. // 10
@@ -148,4 +182,12 @@ int main (int argc, const char * argv[]) {
     
     // Finally, release your queue just as you would any GCD queue.    // 11
     dispatch_release(queue);
+
+    struct timeval end_time;
+    gettimeofday(&end_time, NULL);
+
+    time_t diffsec = difftime(end_time.tv_sec, start_time.tv_sec);
+    suseconds_t diffsub = end_time.tv_usec - start_time.tv_usec;
+    double realsec = diffsec + diffsub * 1e-6;
+    printf("%f sec\n", realsec);
 }
