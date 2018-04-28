@@ -58,7 +58,7 @@ int main (int argc, const char * argv[]) {
     // GPU in our system.                                             // 2
     dispatch_queue_t queue = NULL;
     
-    queue = gcl_create_dispatch_queue(CL_DEVICE_TYPE_GPU, NULL);
+    // queue = gcl_create_dispatch_queue(CL_DEVICE_TYPE_GPU, NULL);
     
     // In the event that our system does NOT have an OpenCL-compatible GPU,
     // we can use the OpenCL CPU compute device instead.
@@ -167,27 +167,29 @@ int main (int argc, const char * argv[]) {
     });
     
     
+    // Don't forget to free up the CL device's memory when you're done. // 10
+    gcl_free(mem_in);
+    gcl_free(mem_out);
+
+    // Finally, release your queue just as you would any GCD queue.    // 11
+    dispatch_release(queue);
+    
+    struct timeval end_time;
+    gettimeofday(&end_time, NULL);
+    
+    time_t diffsec = difftime(end_time.tv_sec, start_time.tv_sec);
+    suseconds_t diffsub = end_time.tv_usec - start_time.tv_usec;
+    double realsec = diffsec + diffsub * 1e-6;
+    printf("%f sec\n", realsec);
+
+    
     // Check to see if the kernel did what it was supposed to:
     if ( validate(test_in, test_out)) {
         fprintf(stdout, "All values were OK.\n");
     }
     
-    // Don't forget to free up the CL device's memory when you're done. // 10
-    gcl_free(mem_in);
-    gcl_free(mem_out);
-    
     // And the same goes for system memory, as usual.
     free(test_in);
     free(test_out);
     
-    // Finally, release your queue just as you would any GCD queue.    // 11
-    dispatch_release(queue);
-
-    struct timeval end_time;
-    gettimeofday(&end_time, NULL);
-
-    time_t diffsec = difftime(end_time.tv_sec, start_time.tv_sec);
-    suseconds_t diffsub = end_time.tv_usec - start_time.tv_usec;
-    double realsec = diffsec + diffsub * 1e-6;
-    printf("%f sec\n", realsec);
 }
