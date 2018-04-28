@@ -15,18 +15,22 @@ kernel void logisticsmap(
                          global int *input,
                          global int *output)
 {
+    int x, m, pp;
     size_t i = get_global_id(0);
-    output[i] = input[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
-    output[i] = mu[i] * output[i] * (output[i] + 1) % p[i];
+    x = input[i];
+    m = mu[i];
+    pp = p[i];
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    x = m * x * (x + 1) % pp;
+    output[i] = x;
 }
 #else
 kernel void logisticsmap(
