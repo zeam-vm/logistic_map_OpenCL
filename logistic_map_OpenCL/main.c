@@ -14,6 +14,8 @@
 #define P 6700417
 #define MU 22
 
+#define GPU
+
 // Hard-coded number of values to test, for convenience.
 #define NUM_VALUES 0x2000000
 
@@ -58,7 +60,9 @@ int main (int argc, const char * argv[]) {
     // GPU in our system.                                             // 2
     dispatch_queue_t queue = NULL;
     
+#ifdef GPU
     queue = gcl_create_dispatch_queue(CL_DEVICE_TYPE_GPU, NULL);
+#endif
     
     // In the event that our system does NOT have an OpenCL-compatible GPU,
     // we can use the OpenCL CPU compute device instead.
