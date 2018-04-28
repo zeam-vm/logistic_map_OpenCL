@@ -73,7 +73,7 @@ int main(int argc, const char * argv[]) {
     // コンパイル済みclプログラムの読み込み
     const char* bitcode_path = "OpenCL/kernel.cl.gpu_32.bc";
     size_t len = strlen(bitcode_path);
-    cl_program program = clCreateProgramWithBinary(ctx, 1, devices, &len, (const unsigned char**)&bitcode_path, NULL,&err);
+    cl_program program = clCreateProgramWithBinary(ctx, 1, devices, &len, (const unsigned char**)&bitcode_path, NULL, &err);
     EC2("clCreateProgramWithBinary");
     
     // プログラムのビルド
@@ -130,6 +130,7 @@ int main(int argc, const char * argv[]) {
     // コンテキストの解放
     EC(clReleaseContext(ctx), "clReleaseContext");
     
+    free(data);
     printf("Done.\n");
     return EXIT_SUCCESS;
 }
