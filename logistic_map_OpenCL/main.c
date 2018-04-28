@@ -61,9 +61,11 @@ int main(int argc, const char * argv[]) {
     printf("%d device(s) found.\n", deviceCount);
     for(int i = 0; i < deviceCount; i++) {
         char name[100] = {0};
+        char vendor[100] = {0};
         size_t len;
         EC(clGetDeviceInfo(devices[i], CL_DEVICE_NAME, sizeof(name), name, &len), "clGetDeviceInfo");
-        printf("Device id: %d, Name: %s\n", i, name);
+        EC(clGetDeviceInfo(devices[i], CL_DEVICE_VENDOR, sizeof(vendor), vendor, &len), "clGetDeviceInfo");
+        printf("Device id: %d, Name: %s, Vendor: %s\n", i, name, vendor);
     }
     
     // コンテキストの作成
@@ -75,6 +77,8 @@ int main(int argc, const char * argv[]) {
     size_t len = strlen(bitcode_path);
     cl_program program = clCreateProgramWithBinary(ctx, 1, devices, &len, (const unsigned char**)&bitcode_path, NULL, &err);
     EC2("clCreateProgramWithBinary");
+    
+    printf("%p\n", program);
     
     // プログラムのビルド
     EC(clBuildProgram(program, 1, devices, NULL, NULL, NULL), "clBuildProgram");
