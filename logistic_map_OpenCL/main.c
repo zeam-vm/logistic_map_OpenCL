@@ -58,7 +58,7 @@ int main (int argc, const char * argv[]) {
     // GPU in our system.                                             // 2
     dispatch_queue_t queue = NULL;
     
-    // queue = gcl_create_dispatch_queue(CL_DEVICE_TYPE_GPU, NULL);
+    queue = gcl_create_dispatch_queue(CL_DEVICE_TYPE_GPU, NULL);
     
     // In the event that our system does NOT have an OpenCL-compatible GPU,
     // we can use the OpenCL CPU compute device instead.
