@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		951F9CE8209401DC0095C26A /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 951F9CE7209401DC0095C26A /* main.c */; };
 		951F9CEF209402B00095C26A /* kernel.cl in Sources */ = {isa = PBXBuildFile; fileRef = 951F9CEE209402B00095C26A /* kernel.cl */; };
+		95AD484F20941F8F008256D4 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95AD484E20941F8F008256D4 /* OpenCL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,6 +28,7 @@
 		951F9CE4209401DC0095C26A /* logistic_map_OpenCL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = logistic_map_OpenCL; sourceTree = BUILT_PRODUCTS_DIR; };
 		951F9CE7209401DC0095C26A /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		951F9CEE209402B00095C26A /* kernel.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = kernel.cl; sourceTree = "<group>"; };
+		95AD484E20941F8F008256D4 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -34,6 +36,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				95AD484F20941F8F008256D4 /* OpenCL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -45,6 +48,7 @@
 			children = (
 				951F9CE6209401DC0095C26A /* logistic_map_OpenCL */,
 				951F9CE5209401DC0095C26A /* Products */,
+				95AD484D20941F8F008256D4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -63,6 +67,14 @@
 				951F9CE7209401DC0095C26A /* main.c */,
 			);
 			path = logistic_map_OpenCL;
+			sourceTree = "<group>";
+		};
+		95AD484D20941F8F008256D4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				95AD484E20941F8F008256D4 /* OpenCL.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
