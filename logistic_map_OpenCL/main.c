@@ -69,14 +69,17 @@ int main (int argc, const char * argv[]) {
     if (queue == NULL) {
         queue = gcl_create_dispatch_queue(CL_DEVICE_TYPE_CPU, NULL);
     }
-    
+
     // This is not required, but let's print out the name of the device
     // we are using to do work.  We could use the same function,
     // clGetDeviceInfo, to obtain all manner of information about the device.
     cl_device_id gpu = gcl_get_device_id_with_dispatch_queue(queue);
     clGetDeviceInfo(gpu, CL_DEVICE_NAME, 128, name, NULL);
     fprintf(stdout, "Created a dispatch queue using the %s\n", name);
-    
+
+    struct timeval device_setting_time;
+    gettimeofday(&device_setting_time, NULL);
+
     // Here we hardcode some test data.
     // Normally, when this application is running for real, data would come from
     // some REAL source, such as a camera, a sensor, or some compiled collection
@@ -118,6 +121,9 @@ int main (int argc, const char * argv[]) {
     // we execute our kernel.                                             // 4
     void* mem_out =
     gcl_malloc(sizeof(cl_int) * NUM_VALUES, NULL, CL_MEM_WRITE_ONLY);
+
+    struct timeval array_setting_time;
+    gettimeofday(&array_setting_time, NULL);
     
     // Dispatch the kernel block using one of the dispatch_ commands and the
     // queue created earlier.                                            // 5
@@ -169,7 +175,10 @@ int main (int argc, const char * argv[]) {
         gcl_memcpy(test_out, mem_out, sizeof(cl_float) * NUM_VALUES);
         
     });
-    
+
+    struct timeval executing_time;
+    gettimeofday(&executing_time, NULL);
+
     
     // Don't forget to free up the CL device's memory when you're done. // 10
     gcl_free(mem_in);
@@ -180,11 +189,31 @@ int main (int argc, const char * argv[]) {
     
     struct timeval end_time;
     gettimeofday(&end_time, NULL);
+
+    time_t devicediffsec = difftime(device_setting_time.tv_sec, start_time.tv_sec);
+    suseconds_t devicediffsub = device_setting_time.tv_usec - start_time.tv_usec;
+    double devicerealsec = devicediffsec + devicediffsub * 1e-6;
+    printf("Device Setting: %f sec\n", devicerealsec);
+
+    time_t arraydiffsec = difftime(array_setting_time.tv_sec, device_setting_time.tv_sec);
+    suseconds_t arraydiffsub = array_setting_time.tv_usec - device_setting_time.tv_usec;
+    double arrayrealsec = arraydiffsec + arraydiffsub * 1e-6;
+    printf("Array Setting: %f sec\n", arrayrealsec);
+
+    time_t executingdiffsec = difftime(executing_time.tv_sec, array_setting_time.tv_sec);
+    suseconds_t executingdiffsub = executing_time.tv_usec - array_setting_time.tv_usec;
+    double executingrealsec = executingdiffsec + executingdiffsub * 1e-6;
+    printf("Executing: %f sec\n", executingrealsec);
+
+    time_t terminationdiffsec = difftime(end_time.tv_sec, executing_time.tv_sec);
+    suseconds_t terminationdiffsub = end_time.tv_usec - executing_time.tv_usec;
+    double terminationrealsec = terminationdiffsec + terminationdiffsub * 1e-6;
+    printf("Termination: %f sec\n", terminationrealsec);
     
-    time_t diffsec = difftime(end_time.tv_sec, start_time.tv_sec);
-    suseconds_t diffsub = end_time.tv_usec - start_time.tv_usec;
-    double realsec = diffsec + diffsub * 1e-6;
-    printf("%f sec\n", realsec);
+    time_t totaldiffsec = difftime(end_time.tv_sec, start_time.tv_sec);
+    suseconds_t totaldiffsub = end_time.tv_usec - start_time.tv_usec;
+    double totalrealsec = totaldiffsec + totaldiffsub * 1e-6;
+    printf("Total: %f sec\n", totalrealsec);
 
     
     // Check to see if the kernel did what it was supposed to:
