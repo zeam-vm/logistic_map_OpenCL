@@ -20,11 +20,11 @@
 #define NUM_VALUES 0x2000000
 
 
-static float logisticsmap_calc(int x, int p, int mu) {
+static int logisticsmap_calc(int x, int p, int mu) {
     return mu * x * (x + 1) % p;
 }
 
-static float logisticsmap_loopCalc(int num, int x, int p, int mu) {
+static int logisticsmap_loopCalc(int num, int x, int p, int mu) {
     for(int i = 0; i < num; i++) {
         x = logisticsmap_calc(x, p, mu);
     }
