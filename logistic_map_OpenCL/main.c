@@ -182,6 +182,8 @@ int main (int argc, const char * argv[]) {
     
     // Don't forget to free up the CL device's memory when you're done. // 10
     gcl_free(mem_in);
+    gcl_free(mem_p);
+    gcl_free(mem_mu);
     gcl_free(mem_out);
 
     // Finally, release your queue just as you would any GCD queue.    // 11
@@ -224,5 +226,6 @@ int main (int argc, const char * argv[]) {
     // And the same goes for system memory, as usual.
     free(test_in);
     free(test_out);
-    
+    free(test_p);
+    free(test_mu);    
 }
